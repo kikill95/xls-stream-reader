@@ -5,16 +5,29 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon tests/index.js --inspect",
-    "test": "standard --verbose"
+    "test": "standard --verbose",
+    "test:fix": "standard --fix --verbose"
   },
   "author": {
     "name": "Kirill Husiatin",
     "email": "kirill.gus@gmail.com"
   },
-  "keywords": ["node", "xls", "xlsx", "xlsm", "stream", "stream reading"],
+  "keywords": [
+    "node",
+    "excel",
+    "xls",
+    "xlsx",
+    "xlsm",
+    "json",
+    "read",
+    "parse",
+    "stream",
+    "stream reading"
+  ],
   "license": "MIT",
   "devDependencies": {
     "nodemon": "^1.13.3",
     "standard": "^10.0.3"
-  }
+  },
+  "dependencies": {}
 }
