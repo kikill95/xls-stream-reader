@@ -1,0 +1,20 @@
+{
+  "name": "xls-stream-reader",
+  "version": "0.1.0",
+  "description": "Package for stream reading xls files in node",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js --inspect",
+    "test": "standard --verbose"
+  },
+  "author": {
+    "name": "Kirill Husiatin",
+    "email": "kirill.gus@gmail.com"
+  },
+  "keywords": ["node", "xls", "xlsx", "xlsm", "stream", "stream reading"],
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.13.3",
+    "standard": "^10.0.3"
+  }
+}
