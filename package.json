@@ -4,7 +4,7 @@
   "description": "Package for stream reading xls files in node",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon tests/index.js --inspect",
+    "start": "nodemon tests/index.js",
     "test": "standard --verbose",
     "test:fix": "standard --fix --verbose"
   },
@@ -21,13 +21,16 @@
     "json",
     "read",
     "parse",
-    "stream",
-    "stream reading"
+    "stream"
   ],
   "license": "MIT",
   "devDependencies": {
     "nodemon": "^1.13.3",
     "standard": "^10.0.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "exceljs": "^0.8.1",
+    "joi": "^13.0.2",
+    "lodash": "^4.17.4"
+  }
 }
