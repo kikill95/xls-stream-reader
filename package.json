@@ -4,7 +4,7 @@
   "description": "Package for stream reading xls files in node",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js --inspect",
+    "start": "nodemon tests/index.js --inspect",
     "test": "standard --verbose"
   },
   "author": {
