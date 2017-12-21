@@ -31,6 +31,7 @@
   "dependencies": {
     "exceljs": "^0.8.1",
     "joi": "^13.0.2",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "xlsx-stream-reader": "git+https://github.com/DaSpawn/xlsx-stream-reader.git"
   }
 }
