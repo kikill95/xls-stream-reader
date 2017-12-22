@@ -29,6 +29,7 @@
     "standard": "^10.0.3"
   },
   "dependencies": {
+    "excel-as-json": "^2.0.1",
     "exceljs": "^0.8.1",
     "joi": "^13.0.2",
     "lodash": "^4.17.4",
