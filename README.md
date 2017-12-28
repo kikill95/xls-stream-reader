@@ -1,6 +1,6 @@
 # xls-stream-reader
 
-node package for reading xls, xlsx, xlsm files as streams
+node package for reading **only** xlsx, xlsm files as streams
 
 ## Development
 

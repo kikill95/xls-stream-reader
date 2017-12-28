@@ -4,17 +4,33 @@
   "description": "Package for stream reading xls files in node",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon tests/index.js --inspect",
-    "test": "standard --verbose"
+    "start": "nodemon tests/index.js",
+    "test": "standard --verbose",
+    "test:fix": "standard --fix --verbose"
   },
   "author": {
     "name": "Kirill Husiatin",
     "email": "kirill.gus@gmail.com"
   },
-  "keywords": ["node", "xls", "xlsx", "xlsm", "stream", "stream reading"],
+  "keywords": [
+    "node",
+    "excel",
+    "xls",
+    "xlsx",
+    "xlsm",
+    "json",
+    "read",
+    "parse",
+    "stream"
+  ],
   "license": "MIT",
   "devDependencies": {
     "nodemon": "^1.13.3",
     "standard": "^10.0.3"
+  },
+  "dependencies": {
+    "exceljs": "^0.8.1",
+    "joi": "^13.0.2",
+    "lodash": "^4.17.4"
   }
 }
