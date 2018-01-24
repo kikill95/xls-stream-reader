@@ -160,7 +160,7 @@ class ExcelReader {
           // If this is an object, then a formula has been applied
           // We just take the result in that case
           // If this is a date, then we work with another format
-          cellValue = cell.value.result || cell.value
+          cellValue = cell.value.result || (cell.value.toDateString ? cell.value.toDateString() : cell.value)
         }
         result[currentHeader.key] = cellValue
       }
