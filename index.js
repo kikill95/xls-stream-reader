@@ -152,6 +152,10 @@ class ExcelReader {
       if (!cell) {
         return
       }
+      // predefine with empty strings
+      headerRowValues.forEach(function (headerValue) {
+        result[headerValue] = ''
+      })
       let header = headerRowValues[cellNo]
       if (header) {
         let currentHeader = _.find(allowedHeaders, {name: header})
