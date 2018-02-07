@@ -25,7 +25,7 @@ class ExcelReader {
             name: firstSheet.name,
             rows: {
               headerRow: this.config.headerIndex + 1,
-              allowedHeaders: headerRow._cells.map(cell => {
+              allowedHeaders: headerRow && headerRow._cells.map(cell => {
                 return {
                   name: cell.value,
                   key: cell.value
