@@ -78,15 +78,16 @@ class ExcelReader {
     let lastMessage = ''
 
     // collecting sheet stats
-    this.workbook.eachSheet((worksheet, sheetId) => {
-      let name = worksheet.name
-      let sheetSchema = _.find(sheetOptions, {name: name})
-      let result = this._checkSheet(worksheet, sheetSchema)
-      if (result.isValid === false) {
-        isValid = result.isValid
-        lastMessage = result.message
-      }
-    })
+    // this.workbook.eachSheet((worksheet, sheetId) => {
+    let worksheet = this.workbook.worksheets[0]
+    let name = worksheet.name
+    let sheetSchema = _.find(sheetOptions, {name: name})
+    let result = this._checkSheet(worksheet, sheetSchema)
+    if (result.isValid === false) {
+      isValid = result.isValid
+      lastMessage = result.message
+    }
+    // })
 
     // after all checks, if boolean is false, then throw
     if (!isValid) {
@@ -186,24 +187,25 @@ class ExcelReader {
   eachRow (callback) {
     return this.afterRead.then(() => {
       let rowPromises = []
-      this.workbook.eachSheet((worksheet, sheetId) => {
-        let sheetName = worksheet.name
-        let sheetOptions = _.find(this.options.sheets, {name: worksheet.name})
-        let sheetKey = sheetOptions.key ? sheetOptions.key : sheetName
-        let headerRow = sheetOptions.rows.headerRow ? sheetOptions.rows.headerRow : 1
-        let allowedHeaders = sheetOptions.rows.allowedHeaders
-        let headerRowValues = worksheet.getRow(headerRow).values
-        worksheet.eachRow((row, rowNum) => {
-          // ignoring all the rows lesser than the headerRow
-          if (rowNum <= headerRow) {
-            return
-          }
-          // processing the rest rows
-          let normalizedRowNum = rowNum - headerRow
-          let rowData = this._getRowData(row, normalizedRowNum, allowedHeaders, headerRowValues)
-          rowPromises.push(callback(rowData, normalizedRowNum, sheetKey))
-        })
+      // this.workbook.eachSheet((worksheet, sheetId) => {
+      let worksheet = this.workbook.worksheets[0]
+      let sheetName = worksheet.name
+      let sheetOptions = _.find(this.options.sheets, {name: worksheet.name})
+      let sheetKey = sheetOptions.key ? sheetOptions.key : sheetName
+      let headerRow = sheetOptions.rows.headerRow ? sheetOptions.rows.headerRow : 1
+      let allowedHeaders = sheetOptions.rows.allowedHeaders
+      let headerRowValues = worksheet.getRow(headerRow).values
+      worksheet.eachRow((row, rowNum) => {
+        // ignoring all the rows lesser than the headerRow
+        if (rowNum <= headerRow) {
+          return
+        }
+        // processing the rest rows
+        let normalizedRowNum = rowNum - headerRow
+        let rowData = this._getRowData(row, normalizedRowNum, allowedHeaders, headerRowValues)
+        rowPromises.push(callback(rowData, normalizedRowNum, sheetKey))
       })
+      // })
       return Promise.all(rowPromises)
     })
   }
