@@ -149,9 +149,9 @@ class ExcelReader {
   _getRowData (rowObject, rowNum, allowedHeaders, headerRowValues) {
     let result = {}
     // predefine with empty strings
-    headerRowValues.forEach(function (headerValue) {
-      result[headerValue] = ''
-    })
+    // headerRowValues.forEach(function (headerValue) {
+    //   result[headerValue] = ''
+    // })
     rowObject.eachCell((cell, cellNo) => {
       // Finding the header value at this index
       if (!cell) {
@@ -185,9 +185,7 @@ class ExcelReader {
   *  The callback must return a promise
   */
   eachRow (callback) {
-    return this.afterRead.then(() => {
-      let rowPromises = []
-      // this.workbook.eachSheet((worksheet, sheetId) => {
+    return this.afterRead.then(async () => {
       let worksheet = this.workbook.worksheets[0]
       let sheetName = worksheet.name
       let sheetOptions = _.find(this.options.sheets, {name: worksheet.name})
@@ -195,18 +193,16 @@ class ExcelReader {
       let headerRow = sheetOptions.rows.headerRow ? sheetOptions.rows.headerRow : 1
       let allowedHeaders = sheetOptions.rows.allowedHeaders
       let headerRowValues = worksheet.getRow(headerRow).values
-      worksheet.eachRow((row, rowNum) => {
+      for (let rowNum = 0; rowNum < worksheet.rowCount; rowNum++) {
         // ignoring all the rows lesser than the headerRow
-        if (rowNum <= headerRow) {
-          return
+        if (rowNum > headerRow) {
+          // processing the rest rows
+          let normalizedRowNum = rowNum - headerRow
+          let rowData = this._getRowData(worksheet.getRow(rowNum), normalizedRowNum, allowedHeaders, headerRowValues)
+          await callback(rowData, normalizedRowNum, sheetKey)
         }
-        // processing the rest rows
-        let normalizedRowNum = rowNum - headerRow
-        let rowData = this._getRowData(row, normalizedRowNum, allowedHeaders, headerRowValues)
-        rowPromises.push(callback(rowData, normalizedRowNum, sheetKey))
-      })
-      // })
-      return Promise.all(rowPromises)
+      }
+      return Promise.resolve()
     })
   }
 }
