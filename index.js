@@ -149,9 +149,9 @@ class ExcelReader {
   _getRowData (rowObject, rowNum, allowedHeaders, headerRowValues) {
     let result = {}
     // predefine with empty strings
-    // headerRowValues.forEach(function (headerValue) {
-    //   result[headerValue] = ''
-    // })
+    headerRowValues.forEach(function (headerValue) {
+      result[headerValue] = ''
+    })
     rowObject.eachCell((cell, cellNo) => {
       // Finding the header value at this index
       if (!cell) {
