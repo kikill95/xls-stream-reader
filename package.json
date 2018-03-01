@@ -1,6 +1,6 @@
 {
-  "name": "xls-stream-reader",
-  "version": "0.1.0",
+  "name": "ek-xls-stream-reader",
+  "version": "1.0.0",
   "description": "Package for stream reading xls files in node",
   "main": "index.js",
   "scripts": {
