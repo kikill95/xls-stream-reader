@@ -169,7 +169,7 @@ class ExcelReader {
           cellValue = cell.value.result
           if (!cellValue) {
             if (cell.value.toDateString) {
-              cellValue = dateFormat(cell.value, cell.style.numFmt)
+              cellValue = dateFormat(cell.value, cell.style.numFmt.toLowerCase())
             } else {
               cellValue = cell.value
             }
