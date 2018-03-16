@@ -1,6 +1,7 @@
 const Excel = require('exceljs')
 const Joi = require('joi')
 const _ = require('lodash')
+const dateFormat = require('dateformat')
 
 class ExcelReader {
   constructor (dataStream, config, options) {
@@ -165,7 +166,14 @@ class ExcelReader {
           // If this is an object, then a formula has been applied
           // We just take the result in that case
           // If this is a date, then we work with another format
-          cellValue = cell.value.result || (cell.value.toDateString ? cell.value.toDateString() : cell.value)
+          cellValue = cell.value.result
+          if (!cellValue) {
+            if (cell.value.toDateString) {
+              cellValue = dateFormat(cell.value, cell.style.numFmt)
+            } else {
+              cellValue = cell.value
+            }
+          }
           if (typeof cellValue === 'object') {
             try {
               // case when we have `rich text` - text that consists texts with different styles
