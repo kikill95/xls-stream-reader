@@ -3,10 +3,12 @@ const Joi = require('joi')
 const _ = require('lodash')
 const dateFormat = require('dateformat')
 
+const checkHeaderCount = 20 // WARNING: HARDCODED
+
 class ExcelReader {
   constructor (dataStream, config, options) {
     this.stream = dataStream
-    this.config = config || {headerIndex: 0}
+    this.config = config || {}
     this.options = options || {sheets: []}
     this.workbook = new Excel.Workbook()
     this.afterRead = this._read()
@@ -20,20 +22,31 @@ class ExcelReader {
       .then((workbook) => {
         if (this.options.sheets.length === 0) {
           // generate sheet if non passed in options
-          let firstSheet = workbook._worksheets.filter(el => el)[0]
-          let headerRow = firstSheet._rows[this.config.headerIndex]
-          this.options.sheets.push({
-            name: firstSheet.name,
-            rows: {
-              headerRow: this.config.headerIndex + 1,
-              allowedHeaders: headerRow && headerRow._cells.map(cell => {
-                return {
-                  name: cell.value,
-                  key: cell.value
-                }
-              })
+          workbook._worksheets = workbook._worksheets.filter(el => el)
+          for (let sheet of workbook._worksheets) {
+            let headerIndex = 0
+            let biggestLength = 0
+            for (let index = 0; index < checkHeaderCount; index++) {
+              let row = sheet._rows[index]
+              if (row && row._cells.filter(el => el && el.value).length > biggestLength) {
+                biggestLength = row._cells.filter(el => el && el.value).length
+                headerIndex = index
+              }
             }
-          })
+            let headerRow = sheet._rows[headerIndex]
+            this.options.sheets.push({
+              name: sheet.name,
+              rows: {
+                headerRow: headerIndex + 1,
+                allowedHeaders: headerRow && headerRow._cells.map(cell => {
+                  return {
+                    name: cell.value,
+                    key: cell.value
+                  }
+                })
+              }
+            })
+          }
         }
         return this._checkWorkbook()
       })
@@ -200,20 +213,21 @@ class ExcelReader {
   */
   eachRow (callback) {
     return this.afterRead.then(async () => {
-      let worksheet = this.workbook.worksheets[0]
-      let sheetName = worksheet.name
-      let sheetOptions = _.find(this.options.sheets, {name: worksheet.name})
-      let sheetKey = sheetOptions.key ? sheetOptions.key : sheetName
-      let headerRow = sheetOptions.rows.headerRow ? sheetOptions.rows.headerRow : 1
-      let allowedHeaders = sheetOptions.rows.allowedHeaders
-      let headerRowValues = worksheet.getRow(headerRow).values
-      for (let rowNum = 0; rowNum < worksheet.rowCount; rowNum++) {
-        // ignoring all the rows lesser than the headerRow
-        if (rowNum > headerRow) {
-          // processing the rest rows
-          let normalizedRowNum = rowNum - headerRow
-          let rowData = this._getRowData(worksheet.getRow(rowNum), normalizedRowNum, allowedHeaders, headerRowValues)
-          await callback(rowData, normalizedRowNum, sheetKey)
+      for (let worksheet of this.workbook.worksheets) {
+        let sheetName = worksheet.name
+        let sheetOptions = _.find(this.options.sheets, {name: worksheet.name})
+        let sheetKey = sheetOptions.key ? sheetOptions.key : sheetName
+        let headerRow = sheetOptions.rows.headerRow ? sheetOptions.rows.headerRow : 1
+        let allowedHeaders = sheetOptions.rows.allowedHeaders
+        let headerRowValues = worksheet.getRow(headerRow).values
+        for (let rowNum = 0; rowNum < worksheet.rowCount; rowNum++) {
+          // ignoring all the rows lesser than the headerRow
+          if (rowNum > headerRow) {
+            // processing the rest rows
+            let normalizedRowNum = rowNum - headerRow
+            let rowData = this._getRowData(worksheet.getRow(rowNum), normalizedRowNum, allowedHeaders, headerRowValues)
+            await callback(rowData, normalizedRowNum, sheetKey)
+          }
         }
       }
       return Promise.resolve()
