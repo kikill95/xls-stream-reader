@@ -213,21 +213,20 @@ class ExcelReader {
   */
   eachRow (callback) {
     return this.afterRead.then(async () => {
-      for (let worksheet of this.workbook.worksheets) {
-        let sheetName = worksheet.name
-        let sheetOptions = _.find(this.options.sheets, {name: worksheet.name})
-        let sheetKey = sheetOptions.key ? sheetOptions.key : sheetName
-        let headerRow = sheetOptions.rows.headerRow ? sheetOptions.rows.headerRow : 1
-        let allowedHeaders = sheetOptions.rows.allowedHeaders
-        let headerRowValues = worksheet.getRow(headerRow).values
-        for (let rowNum = 0; rowNum < worksheet.rowCount; rowNum++) {
-          // ignoring all the rows lesser than the headerRow
-          if (rowNum > headerRow) {
-            // processing the rest rows
-            let normalizedRowNum = rowNum - headerRow
-            let rowData = this._getRowData(worksheet.getRow(rowNum), normalizedRowNum, allowedHeaders, headerRowValues)
-            await callback(rowData, normalizedRowNum, sheetKey)
-          }
+      let worksheet = this.workbook.worksheets[0]
+      let sheetName = worksheet.name
+      let sheetOptions = _.find(this.options.sheets, {name: worksheet.name})
+      let sheetKey = sheetOptions.key ? sheetOptions.key : sheetName
+      let headerRow = sheetOptions.rows.headerRow ? sheetOptions.rows.headerRow : 1
+      let allowedHeaders = sheetOptions.rows.allowedHeaders
+      let headerRowValues = worksheet.getRow(headerRow).values
+      for (let rowNum = 0; rowNum < worksheet.rowCount; rowNum++) {
+        // ignoring all the rows lesser than the headerRow
+        if (rowNum > headerRow) {
+          // processing the rest rows
+          let normalizedRowNum = rowNum - headerRow
+          let rowData = this._getRowData(worksheet.getRow(rowNum), normalizedRowNum, allowedHeaders, headerRowValues)
+          await callback(rowData, normalizedRowNum, sheetKey)
         }
       }
       return Promise.resolve()
