@@ -3,7 +3,8 @@ const Joi = require('joi')
 const _ = require('lodash')
 const dateFormat = require('dateformat')
 
-const checkHeaderCount = 20 // WARNING: HARDCODED
+const checkHeaderCount = 50 // WARNING: HARDCODED
+const checkIsEmptyCount = 50 // WARNING: HARDCODED
 
 class ExcelReader {
   constructor (dataStream, config, options) {
@@ -22,31 +23,37 @@ class ExcelReader {
       .then((workbook) => {
         if (this.options.sheets.length === 0) {
           // generate sheet if non passed in options
-          workbook._worksheets = workbook._worksheets.filter(el => el)
-          for (let sheet of workbook._worksheets) {
-            let headerIndex = 0
-            let biggestLength = 0
-            for (let index = 0; index < checkHeaderCount; index++) {
-              let row = sheet._rows[index]
-              if (row && row._cells.filter(el => el && el.value).length > biggestLength) {
-                biggestLength = row._cells.filter(el => el && el.value).length
-                headerIndex = index
-              }
+          workbook._worksheets = workbook._worksheets.filter(el => {
+            if (el && el._rows && el._rows.slice(0, checkIsEmptyCount).reduce((acc, row) => acc + (row && row._cells ? row._cells.filter(el => el && el.value).length : 0), 0)) {
+              // if sheet has any data in `checkIsEmptyCount` rows
+              return true
+            } else {
+              return false
             }
-            let headerRow = sheet._rows[headerIndex]
-            this.options.sheets.push({
-              name: sheet.name,
-              rows: {
-                headerRow: headerIndex + 1,
-                allowedHeaders: headerRow && headerRow._cells.map(cell => {
-                  return {
-                    name: cell.value,
-                    key: cell.value
-                  }
-                })
-              }
-            })
+          })
+          let sheet = workbook._worksheets[0] // work only with first non empty and valid sheet
+          let headerIndex = 0
+          let biggestLength = 0
+          for (let index = 0; index < checkHeaderCount; index++) {
+            let row = sheet._rows[index]
+            if (row && row._cells.filter(el => el && el.value).length > biggestLength) {
+              biggestLength = row._cells.filter(el => el && el.value).length
+              headerIndex = index
+            }
           }
+          let headerRow = sheet._rows[headerIndex]
+          this.options.sheets.push({
+            name: sheet.name,
+            rows: {
+              headerRow: headerIndex + 1,
+              allowedHeaders: headerRow && headerRow._cells.map(cell => {
+                return {
+                  name: cell.value,
+                  key: cell.value
+                }
+              })
+            }
+          })
         }
         return this._checkWorkbook()
       })
@@ -92,8 +99,7 @@ class ExcelReader {
     let lastMessage = ''
 
     // collecting sheet stats
-    // this.workbook.eachSheet((worksheet, sheetId) => {
-    let worksheet = this.workbook.worksheets[0]
+    let worksheet = this.workbook._worksheets[0] // work only with first sheet
     let name = worksheet.name
     let sheetSchema = _.find(sheetOptions, {name: name})
     let result = this._checkSheet(worksheet, sheetSchema)
@@ -101,7 +107,6 @@ class ExcelReader {
       isValid = result.isValid
       lastMessage = result.message
     }
-    // })
 
     // after all checks, if boolean is false, then throw
     if (!isValid) {
@@ -213,7 +218,7 @@ class ExcelReader {
   */
   eachRow (callback) {
     return this.afterRead.then(async () => {
-      let worksheet = this.workbook.worksheets[0]
+      let worksheet = this.workbook._worksheets[0] // work only with first sheet
       let sheetName = worksheet.name
       let sheetOptions = _.find(this.options.sheets, {name: worksheet.name})
       let sheetKey = sheetOptions.key ? sheetOptions.key : sheetName

@@ -24,6 +24,10 @@ node package for reading **only** xlsx, xlsm files as streams
     })
   ```
 
+## Be aware
+
+  This package works only with first sheet where first **50** rows aren't empty
+
 ## Development
 
   npm start
