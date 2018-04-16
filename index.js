@@ -36,9 +36,14 @@ class ExcelReader {
           let biggestLength = 0
           for (let index = 0; index < checkHeaderCount; index++) {
             let row = sheet._rows[index]
-            if (row && row._cells.filter(el => el && el.value).length > biggestLength) {
-              biggestLength = row._cells.filter(el => el && el.value).length
-              headerIndex = index
+            if (row) {
+              let filtered = row._cells
+                .map(el => el && el.value)
+                .filter((value, index, array) => value && array.indexOf(value) === index)
+              if (filtered.length > biggestLength) {
+                biggestLength = filtered.length
+                headerIndex = index
+              }
             }
           }
           let headerRow = sheet._rows[headerIndex]
@@ -225,14 +230,11 @@ class ExcelReader {
       let headerRow = sheetOptions.rows.headerRow ? sheetOptions.rows.headerRow : 1
       let allowedHeaders = sheetOptions.rows.allowedHeaders
       let headerRowValues = worksheet.getRow(headerRow).values
-      for (let rowNum = 0; rowNum < worksheet.rowCount; rowNum++) {
-        // ignoring all the rows lesser than the headerRow
-        if (rowNum > headerRow) {
-          // processing the rest rows
-          let normalizedRowNum = rowNum - headerRow
-          let rowData = this._getRowData(worksheet.getRow(rowNum), normalizedRowNum, allowedHeaders, headerRowValues)
-          await callback(rowData, normalizedRowNum, sheetKey)
-        }
+      for (let rowNum = headerRow + 1; rowNum <= worksheet.rowCount; rowNum++) {
+        // processing the rest rows
+        let normalizedRowNum = rowNum - headerRow
+        let rowData = this._getRowData(worksheet.getRow(rowNum), normalizedRowNum, allowedHeaders, headerRowValues)
+        await callback(rowData, normalizedRowNum, sheetKey)
       }
       return Promise.resolve()
     })
