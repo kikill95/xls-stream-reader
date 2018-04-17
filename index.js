@@ -1,5 +1,4 @@
 const Excel = require('exceljs')
-const Joi = require('joi')
 const _ = require('lodash')
 const dateFormat = require('dateformat')
 
@@ -16,10 +15,7 @@ class ExcelReader {
   }
 
   _read () {
-    return this._validateOptions()
-      .then(() => {
-        return this.workbook.xlsx.read(this.stream)
-      })
+    return this.workbook.xlsx.read(this.stream)
       .then((workbook) => {
         if (this.options.sheets.length === 0) {
           // generate sheet if non passed in options
@@ -29,6 +25,13 @@ class ExcelReader {
               return true
             } else {
               return false
+            }
+          })
+          .sort(sheet => {
+            try {
+              return sheet.name === Object.keys(workbook.definedNames.matrixMap['_xlnm._FilterDatabase'].sheets)[0] ? -1 : 1
+            } catch (e) {
+              return 1
             }
           })
           let sheet = workbook._worksheets[0] // work only with first non empty and valid sheet
@@ -60,110 +63,8 @@ class ExcelReader {
             }
           })
         }
-        return this._checkWorkbook()
-      })
-      .then(() => {
         return this.workbook
       })
-  }
-
-  /**
-  * Checks if options are of valid type and schema
-  */
-  _validateOptions () {
-    let schema = Joi.object().keys({
-      sheets: Joi.array().items(Joi.object().keys({
-        name: Joi.string(),
-        key: Joi.string(),
-        allowedNames: Joi.array().items(Joi.string()),
-        rows: Joi.object().keys({
-          headerRow: Joi.number().min(1),
-          allowedHeaders: Joi.array().items(Joi.object().keys({
-            name: Joi.string(),
-            key: Joi.string()
-          }))
-        })
-      }))
-    })
-
-    return new Promise((resolve, reject) => {
-      Joi.validate(this.options, schema, (err) => {
-        if (err) {
-          reject(err)
-        } else resolve()
-      })
-    })
-  }
-
-  _checkWorkbook () {
-    // checks the workbook with the options specified
-    // Used for error checking. Will give errors otherwise
-    const sheetOptions = this.options.sheets
-    // const rowOptions = this.options.rows;
-    let isValid = true
-    let lastMessage = ''
-
-    // collecting sheet stats
-    let worksheet = this.workbook._worksheets[0] // work only with first sheet
-    let name = worksheet.name
-    let sheetSchema = _.find(sheetOptions, {name: name})
-    let result = this._checkSheet(worksheet, sheetSchema)
-    if (result.isValid === false) {
-      isValid = result.isValid
-      lastMessage = result.message
-    }
-
-    // after all checks, if boolean is false, then throw
-    if (!isValid) {
-      throw this._dataError(lastMessage)
-    }
-  }
-
-  /**
-  * Checks a worksheet against its schema to make sure sheet is valid
-  */
-  _checkSheet (worksheet, sheetOptions) {
-    let isValid = true
-    let lastMessage = ''
-    if (!sheetOptions || !sheetOptions.rows || _.isEmpty(sheetOptions.rows)) {
-      isValid = false
-      lastMessage = 'Schema not found for sheet ' + worksheet.name
-    } else if (_.isNumber(sheetOptions.rows.headerRow) && sheetOptions.rows.allowedHeaders) {
-      let rowOptions = sheetOptions.rows
-      let row = worksheet.getRow(rowOptions.headerRow)
-      let headerNames = _.remove(row.values, null)
-      const allowedHeaderNames = _.map(rowOptions.allowedHeaders, 'name')
-      if (!_.chain(headerNames).difference(allowedHeaderNames).isEmpty().value()) {
-        lastMessage = 'The row ' + rowOptions.headerRow + ' must contain headers. Only these header values are allowed: ' + allowedHeaderNames
-        isValid = false
-      }
-    }
-
-    return {
-      isValid: isValid,
-      message: lastMessage
-    }
-  }
-
-  /**
-  * Error that is cause because of incorrect data is inputted to the class
-  */
-  _dataError (message) {
-    return new Error(message)
-  }
-
-  /**
-  * Error that is caused by the class itself, and is not related to the
-  * options provided by the user
-  */
-  _internalError (message) {
-    return new Error('error while parsing excel file: ' + message)
-  }
-
-  getDefaultSheet () {
-    if (this.options.sheets && this.options.sheets.default) {
-      return this.workbook.getWorksheet()
-    } else return null
   }
 
   /**
