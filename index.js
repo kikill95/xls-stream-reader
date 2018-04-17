@@ -233,8 +233,12 @@ class ExcelReader {
       for (let rowNum = headerRow + 1; rowNum <= worksheet.rowCount; rowNum++) {
         // processing the rest rows
         let normalizedRowNum = rowNum - headerRow
-        let rowData = this._getRowData(worksheet.getRow(rowNum), normalizedRowNum, allowedHeaders, headerRowValues)
-        await callback(rowData, normalizedRowNum, sheetKey)
+        try {
+          let rowData = this._getRowData(worksheet.getRow(rowNum), normalizedRowNum, allowedHeaders, headerRowValues)
+          await callback(rowData, normalizedRowNum, sheetKey)
+        } catch (err) {
+          console.error(err)
+        }
       }
       return Promise.resolve()
     })
