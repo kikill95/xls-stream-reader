@@ -185,24 +185,28 @@ class ExcelReader {
       if (header) {
         let currentHeader = _.find(allowedHeaders, {name: header})
         let cellValue = cell.value
-        if (_.isObject(cell.value)) {
-          // If this is an object, then a formula has been applied
-          // We just take the result in that case
-          // If this is a date, then we work with another format
-          cellValue = cell.value.result
-          if (!cellValue) {
-            if (cell.value.toDateString) {
-              cellValue = dateFormat(cell.value, cell.style.numFmt.toLowerCase())
-            } else {
-              cellValue = cell.value
+        try {
+          if (_.isObject(cell.value)) {
+            // If this is an object, then a formula has been applied
+            // We just take the result in that case
+            // If this is a date, then we work with another format
+            cellValue = cell.value.result
+            if (!cellValue) {
+              if (cell.value.toDateString) {
+                cellValue = dateFormat(cell.value, cell.style.numFmt.toLowerCase())
+              } else {
+                cellValue = cell.value
+              }
+            }
+            if (typeof cellValue === 'object') {
+              try {
+                // case when we have `rich text` - text that consists texts with different styles
+                cellValue = Object.values(cell.value).reduce((acc, cur) => acc.concat(cur), []).map(el => el.text).join(' ')
+              } catch (e) {}
             }
           }
-          if (typeof cellValue === 'object') {
-            try {
-              // case when we have `rich text` - text that consists texts with different styles
-              cellValue = Object.values(cell.value).reduce((acc, cur) => acc.concat(cur), []).map(el => el.text).join(' ')
-            } catch (e) {}
-          }
+        } catch (e) {
+          cellValue = cell.value
         }
         result[currentHeader.key] = cellValue
       }
@@ -236,9 +240,7 @@ class ExcelReader {
         try {
           let rowData = this._getRowData(worksheet.getRow(rowNum), normalizedRowNum, allowedHeaders, headerRowValues)
           await callback(rowData, normalizedRowNum, sheetKey)
-        } catch (err) {
-          console.error(err)
-        }
+        } catch (e) {}
       }
       return Promise.resolve()
     })
