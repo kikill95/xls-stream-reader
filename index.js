@@ -27,13 +27,6 @@ class ExcelReader {
               return false
             }
           })
-          .sort(sheet => {
-            try {
-              return sheet.name === Object.keys(workbook.definedNames.matrixMap['_xlnm._FilterDatabase'].sheets)[0] ? -1 : 1
-            } catch (e) {
-              return 1
-            }
-          })
           let sheet = workbook._worksheets[0] // work only with first non empty and valid sheet
           let headerIndex = 0
           let biggestLength = 0
