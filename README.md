@@ -9,11 +9,11 @@ node package for reading **only** xlsx, xlsm files as streams
 ## Usage
 
   ```js
-  const ExcelReader = require('ek-xls-stream-reader')
+  const XLSXReader = require('ek-xls-stream-reader')
 
   // and somewhere from readable stream like `req`
 
-  let reader = new ExcelReader(req)
+  let reader = new XLSXReader(req)
 
   reader
     .eachRow(data => {
@@ -28,11 +28,11 @@ node package for reading **only** xlsx, xlsm files as streams
 
   This package works only with first sheet where first **50** rows aren't empty
 
-## Development (wuth test files)
+## Development (with test files)
 
   npm start
 
-## Tests
+## Tests code style
 
   npm test
 
