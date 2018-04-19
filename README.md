@@ -1,6 +1,6 @@
 # ek-xls-stream-reader
 
-node package for reading **only** xlsx, xlsm files as streams
+node package for reading xlsx, xlsm files as streams
 
 ## Installation
 
@@ -17,7 +17,7 @@ node package for reading **only** xlsx, xlsm files as streams
 
   reader
     .eachRow(data => {
-      console.log(data)
+      // do something with `data` here
     })
     .then(() => {
       console.log('Finished')

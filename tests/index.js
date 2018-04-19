@@ -1,8 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const filePath = path.resolve(__dirname, 'files', 'file3.xlsx')
-// const filePath = path.resolve(__dirname, 'files', 'file2.xlsx')
+const filePath = path.resolve(__dirname, 'files', 'file1.xlsx')
 
 let dataStream = fs.createReadStream(filePath)
 
@@ -12,7 +11,9 @@ let reader = new XLSXReader(dataStream)
 
 console.log('starting parse')
 reader
-  .eachRow(console.log)
+  .eachRow(data => {
+    // do something with `data` here
+  })
   .then(() => {
     console.log('finished')
   })
