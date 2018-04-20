@@ -1,18 +1,19 @@
 const XlsxStreamReader = require('xlsx-stream-reader')
 
+const defaultOptions = {
+  sheetIndex: null,
+  headers: [],
+  validations: {
+    checkEmptyCount: 50
+  }
+}
+
 class XLSXReader {
   constructor (dataStream, customOptions = {}, customValidations = {}) {
+    this.options = Object.assign(defaultOptions, customOptions)
+    this.options.validations = Object.assign(defaultOptions.validations, customValidations)
     this.stream = dataStream
     this.headerIndex = null
-    this.options = {
-      sheetIndex: null,
-      headers: [],
-      ...customOptions,
-      validations: {
-        checkEmptyCount: 50,
-        ...customValidations
-      }
-    }
   }
 
   _formatData (data) {
