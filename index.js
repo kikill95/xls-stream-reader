@@ -27,7 +27,10 @@ class XLSXReader {
 
   eachRow (callback) {
     return new Promise((resolve, reject) => {
-      const workbookStream = new XlsxStreamReader()
+      const workbookStream = new XlsxStreamReader({
+        verbose: false,
+        formatting: true
+      })
       workbookStream.on('error', error => {
         reject(error)
       })
