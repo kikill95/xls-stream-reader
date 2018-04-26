@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 
-const filePath = path.resolve(__dirname, 'files', 'file1.xlsx')
+const filePath = path.resolve(__dirname, 'files', 'file.xlsx')
 
 let dataStream = fs.createReadStream(filePath)
 
