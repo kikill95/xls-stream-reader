@@ -46,7 +46,7 @@ class XLSXReader {
         let workWithFirstBanch = async () => {
           if (savedRows.length > 0 && this.options.headers.length === 0) {
             this.options.sheetIndex = sheetIndex
-            this.options.headers = savedRows[this.headerIndex]
+            this.options.headers = savedRows[this.headerIndex] || []
             savedRows = savedRows.slice(this.headerIndex + 1)
             for (let data of savedRows) {
               await callback(this._formatData(data))
