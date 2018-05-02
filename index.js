@@ -36,15 +36,15 @@ class XLSXReader {
       })
       let sheetIndex = 0
       workbookStream.on('worksheet', workSheetReader => {
+        sheetIndex++
         if (this.options.sheetIndex !== null && this.options.sheetIndex !== sheetIndex) {
           return workSheetReader.skip()
         }
-        sheetIndex++
         let savedRows = []
         let index = 0
         let headerCount = 0
         let workWithFirstBanch = async () => {
-          if (savedRows.length > 0 && this.options.headers.length === 0) {
+          if (savedRows.length > 1 && this.options.headers.length === 0) {
             this.options.sheetIndex = sheetIndex
             this.options.headers = savedRows[this.headerIndex] || []
             savedRows = savedRows.slice(this.headerIndex + 1)
