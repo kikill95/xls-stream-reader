@@ -4,7 +4,7 @@ node package for reading xlsx, xlsm files as streams
 
 ## Installation
 
-  npm i ek-xls-stream-reader
+    npm i ek-xls-stream-reader
 
 ## Usage
 
