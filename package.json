@@ -28,6 +28,6 @@
     "standard": "^10.0.3"
   },
   "dependencies": {
-    "xlsx-stream-reader": "git+https://github.com/kikill95/xlsx-stream-reader.git"
+    "xlsx-stream-reader": "^1.0.1"
   }
 }
