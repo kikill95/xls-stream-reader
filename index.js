@@ -57,7 +57,7 @@ class XLSXReader {
         workSheetReader.on('row', async row => {
           if (index < this.options.validations.checkEmptyCount) {
             let filteredCount = row.values.filter(el => el).length
-            if (this.headerIndex === null && filteredCount > headerCount) {
+            if (filteredCount > headerCount) {
               headerCount = filteredCount
               this.headerIndex = index
             }
