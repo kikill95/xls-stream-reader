@@ -1,6 +1,6 @@
 {
   "name": "ek-xls-stream-reader",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Package for stream reading xlsx files in node",
   "main": "index.js",
   "scripts": {
@@ -28,6 +28,6 @@
     "standard": "^10.0.3"
   },
   "dependencies": {
-    "xlsx-stream-reader": "^1.0.4"
+    "xlsx-stream-reader": "^1.0.7"
   }
 }
